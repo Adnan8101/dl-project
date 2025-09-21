@@ -6,7 +6,7 @@ import warnings
 # Suppress joblib warnings in serverless environment
 warnings.filterwarnings('ignore', category=UserWarning, module='joblib')
 
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory
 import numpy as np
 import pickle
 import time
@@ -96,6 +96,32 @@ except Exception as e:
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    """Serve static files"""
+    try:
+        static_dir = os.path.join(project_root, 'static')
+        file_path = os.path.join(static_dir, filename)
+        
+        print(f"Static file request: {filename}")
+        print(f"Static directory: {static_dir}")
+        print(f"File path: {file_path}")
+        print(f"File exists: {os.path.exists(file_path)}")
+        
+        if os.path.exists(file_path):
+            return send_from_directory(static_dir, filename)
+        else:
+            print(f"File not found: {file_path}")
+            # List directory contents for debugging
+            if os.path.exists(static_dir):
+                files = os.listdir(static_dir)
+                print(f"Available files in static: {files}")
+            return jsonify({'error': f'Static file not found: {filename}', 'available_files': files if 'files' in locals() else []}), 404
+            
+    except Exception as e:
+        print(f"Error serving static file {filename}: {e}")
+        return jsonify({'error': f'Error serving static file: {filename}', 'details': str(e)}), 500
 
 @app.route('/features')
 def get_features():
@@ -400,6 +426,38 @@ def team():
         'institution': 'Deep Learning Course Project',
         'year': '2025'
     })
+
+@app.route('/debug')
+def debug_info():
+    """Debug endpoint to check file structure"""
+    try:
+        info = {
+            'current_dir': current_dir,
+            'project_root': project_root,
+            'static_folder': os.path.join(project_root, 'static'),
+            'templates_folder': os.path.join(project_root, 'templates'),
+            'static_exists': os.path.exists(os.path.join(project_root, 'static')),
+            'templates_exists': os.path.exists(os.path.join(project_root, 'templates')),
+            'working_directory': os.getcwd()
+        }
+        
+        # List static files
+        static_dir = os.path.join(project_root, 'static')
+        if os.path.exists(static_dir):
+            info['static_files'] = os.listdir(static_dir)
+        else:
+            info['static_files'] = []
+            
+        # List template files
+        templates_dir = os.path.join(project_root, 'templates')
+        if os.path.exists(templates_dir):
+            info['template_files'] = os.listdir(templates_dir)
+        else:
+            info['template_files'] = []
+            
+        return jsonify(info)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/health')
 def health_check():
