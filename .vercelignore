@@ -1,0 +1,37 @@
+# Development files
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git files
+.git/
+.gitignore
+
+# Logs
+*.log
+logs/
+
+# Test files
+test_*.py
+*_test.py
+
+# Documentation (optional - remove if you want docs deployed)
+DEPLOYMENT.md
+
+# Backup files
+*.bak
+*.backup
+*.old

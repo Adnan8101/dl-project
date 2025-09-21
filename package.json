@@ -1,0 +1,30 @@
+{
+  "name": "nanomaterial-toxicity-prediction",
+  "version": "1.0.0",
+  "description": "AI-Powered Nanomaterial Toxicity Prediction Platform",
+  "main": "api/index.py",
+  "scripts": {
+    "dev": "python api/index.py",
+    "start": "python api/index.py"
+  },
+  "keywords": [
+    "machine-learning",
+    "toxicity-prediction",
+    "nanomaterials",
+    "flask",
+    "ai"
+  ],
+  "authors": [
+    "Adnan Qureshi",
+    "Chirayu Giri", 
+    "Abdul Adeen"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Adnan8101/dl-project.git"
+  },
+  "engines": {
+    "node": ">=18.x"
+  }
+}

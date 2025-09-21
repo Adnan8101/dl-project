@@ -1,8 +1,4 @@
-# Flask backend for nanomaterial toxicity prediction
-# Provides /predict and /team endpoints
-# Loads model and scaler
-# Team and guide info included
-
+# Vercel-compatible Flask app for nanomaterial toxicity prediction
 from flask import Flask, request, jsonify, render_template
 import numpy as np
 import pickle
@@ -11,7 +7,13 @@ import time
 import json
 from datetime import datetime
 
-app = Flask(__name__, template_folder='templates', static_folder='static')
+# Get the directory of this file
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)
+
+app = Flask(__name__, 
+           template_folder=os.path.join(project_root, 'templates'),
+           static_folder=os.path.join(project_root, 'static'))
 
 # Global variables for model and scaler
 model = None
@@ -23,16 +25,18 @@ def load_ml_model():
     global model, scaler, feature_info
     
     try:
-        # Load model
-        with open('nanomaterial_toxicity_model.pkl', 'rb') as f:
+        # Load model files from the project root
+        model_path = os.path.join(project_root, 'nanomaterial_toxicity_model.pkl')
+        scaler_path = os.path.join(project_root, 'feature_scaler.pkl')
+        feature_path = os.path.join(project_root, 'feature_info.pkl')
+        
+        with open(model_path, 'rb') as f:
             model = pickle.load(f)
         
-        # Load scaler
-        with open('feature_scaler.pkl', 'rb') as f:
+        with open(scaler_path, 'rb') as f:
             scaler = pickle.load(f)
             
-        # Load feature info
-        with open('feature_info.pkl', 'rb') as f:
+        with open(feature_path, 'rb') as f:
             feature_info = pickle.load(f)
             
         print("✅ ML Model loaded successfully!")
@@ -207,40 +211,6 @@ def predict():
             'status_log': status_log if 'status_log' in locals() else []
         }), 500
 
-@app.route('/model-info')
-def model_info():
-    """Get information about the trained model"""
-    if not model:
-        return jsonify({'error': 'Model not loaded'}), 500
-    
-    try:
-        info = {
-            'model_type': 'Random Forest Classifier',
-            'n_estimators': model.n_estimators,
-            'max_depth': model.max_depth,
-            'n_features': model.n_features_in_,
-            'feature_names': feature_info['names'] if feature_info else [],
-            'training_accuracy': '86.25%',  # From training results
-            'model_size': f"{len(pickle.dumps(model)) / 1024:.1f} KB"
-        }
-        return jsonify(info)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/team')
-def team():
-    return jsonify({
-        'project': 'Nanomaterial Toxicity Prediction Using Deep Learning',
-        'team': [
-            {'name': 'Adnan Qureshi', 'roll': 67, 'role': 'Lead Developer'},
-            {'name': 'Chirayu Giri', 'roll': 68, 'role': 'ML Engineer'},
-            {'name': 'Abdul Adeen', 'roll': 69, 'role': 'Web Developer'}
-        ],
-        'guide': 'Mrs. Sampada Bhonde',
-        'institution': 'Deep Learning Course Project',
-        'year': '2025'
-    })
-
 @app.route('/detailed-analysis', methods=['POST'])
 def detailed_analysis():
     """Generate detailed analysis report with statistics and insights"""
@@ -352,6 +322,40 @@ def detailed_analysis():
     except Exception as e:
         return jsonify({'error': f'Analysis failed: {str(e)}'}), 500
 
+@app.route('/model-info')
+def model_info():
+    """Get information about the trained model"""
+    if not model:
+        return jsonify({'error': 'Model not loaded'}), 500
+    
+    try:
+        info = {
+            'model_type': 'Random Forest Classifier',
+            'n_estimators': model.n_estimators,
+            'max_depth': model.max_depth,
+            'n_features': model.n_features_in_,
+            'feature_names': feature_info['names'] if feature_info else [],
+            'training_accuracy': '86.25%',  # From training results
+            'model_size': f"{len(pickle.dumps(model)) / 1024:.1f} KB"
+        }
+        return jsonify(info)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/team')
+def team():
+    return jsonify({
+        'project': 'Nanomaterial Toxicity Prediction Using Deep Learning',
+        'team': [
+            {'name': 'Adnan Qureshi', 'roll': 67, 'role': 'Lead Developer'},
+            {'name': 'Chirayu Giri', 'roll': 68, 'role': 'ML Engineer'},
+            {'name': 'Abdul Adeen', 'roll': 69, 'role': 'Web Developer'}
+        ],
+        'guide': 'Mrs. Sampada Bhonde',
+        'institution': 'Deep Learning Course Project',
+        'year': '2025'
+    })
+
 @app.route('/health')
 def health_check():
     """Health check endpoint"""
@@ -362,6 +366,10 @@ def health_check():
         'features_loaded': feature_info is not None,
         'timestamp': datetime.now().isoformat()
     })
+
+# For Vercel deployment
+def handler(request):
+    return app(request.environ, lambda *args: None)
 
 if __name__ == '__main__':
     print("🚀 Starting Nanomaterial Toxicity Prediction Server...")
