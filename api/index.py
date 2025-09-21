@@ -1,8 +1,14 @@
 # Vercel-compatible Flask app for nanomaterial toxicity prediction
+import sys
+import os
+import warnings
+
+# Suppress joblib warnings in serverless environment
+warnings.filterwarnings('ignore', category=UserWarning, module='joblib')
+
 from flask import Flask, request, jsonify, render_template
 import numpy as np
 import pickle
-import os
 import time
 import json
 from datetime import datetime
@@ -11,9 +17,15 @@ from datetime import datetime
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
 
+# Create Flask app with proper configuration for Vercel
 app = Flask(__name__, 
            template_folder=os.path.join(project_root, 'templates'),
            static_folder=os.path.join(project_root, 'static'))
+
+# Configure app for production
+app.config['ENV'] = 'production'
+app.config['DEBUG'] = False
+app.config['TESTING'] = False
 
 # Global variables for model and scaler
 model = None
@@ -30,14 +42,41 @@ def load_ml_model():
         scaler_path = os.path.join(project_root, 'feature_scaler.pkl')
         feature_path = os.path.join(project_root, 'feature_info.pkl')
         
-        with open(model_path, 'rb') as f:
-            model = pickle.load(f)
+        # Check if files exist
+        if not os.path.exists(model_path):
+            print(f"❌ Model file not found: {model_path}")
+            return False
+        if not os.path.exists(scaler_path):
+            print(f"❌ Scaler file not found: {scaler_path}")
+            return False
+        if not os.path.exists(feature_path):
+            print(f"❌ Feature info file not found: {feature_path}")
+            return False
         
-        with open(scaler_path, 'rb') as f:
-            scaler = pickle.load(f)
+        # Load with error handling for each file
+        try:
+            with open(model_path, 'rb') as f:
+                model = pickle.load(f)
+            print("✅ Model loaded successfully")
+        except Exception as e:
+            print(f"❌ Error loading model: {e}")
+            return False
+        
+        try:
+            with open(scaler_path, 'rb') as f:
+                scaler = pickle.load(f)
+            print("✅ Scaler loaded successfully")
+        except Exception as e:
+            print(f"❌ Error loading scaler: {e}")
+            return False
             
-        with open(feature_path, 'rb') as f:
-            feature_info = pickle.load(f)
+        try:
+            with open(feature_path, 'rb') as f:
+                feature_info = pickle.load(f)
+            print("✅ Feature info loaded successfully")
+        except Exception as e:
+            print(f"❌ Error loading feature info: {e}")
+            return False
             
         print("✅ ML Model loaded successfully!")
         return True
@@ -45,8 +84,14 @@ def load_ml_model():
         print(f"❌ Error loading model: {e}")
         return False
 
-# Load model on startup
-load_ml_model()
+# Load model on startup with error handling
+try:
+    load_ml_model()
+except Exception as e:
+    print(f"Warning: Could not load model on startup: {e}")
+    model = None
+    scaler = None
+    feature_info = None
 
 @app.route('/')
 def index():
@@ -367,10 +412,16 @@ def health_check():
         'timestamp': datetime.now().isoformat()
     })
 
-# For Vercel deployment
-def handler(request):
-    return app(request.environ, lambda *args: None)
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({'error': 'Endpoint not found'}), 404
 
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({'error': 'Internal server error'}), 500
+
+# For Vercel deployment - expose the app directly
+# Vercel will automatically handle the WSGI interface
 if __name__ == '__main__':
     print("🚀 Starting Nanomaterial Toxicity Prediction Server...")
     print("📊 Model Status:")
