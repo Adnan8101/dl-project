@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 Nanomaterial Toxicity Prediction | Deep Learning Platform</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔬</text></svg>">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1>🧬 Nanomaterial Toxicity Prediction</h1>
+            <p class="subtitle">AI-Powered Safety Assessment for Nanomaterials</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Introduction Section -->
+            <section class="intro-section">
+                <div class="intro-content">
+                    <h2>🎯 Project Overview</h2>
+                    <p>This advanced machine learning platform predicts nanomaterial toxicity based on physicochemical properties using a trained Random Forest model. Our system provides real-time analysis with detailed risk assessment and confidence scoring.</p>
+                    
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-brain"></i>
+                            <h3>AI-Powered</h3>
+                            <p>Advanced ML algorithms</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-clock"></i>
+                            <h3>Real-Time</h3>
+                            <p>Instant predictions</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-shield-alt"></i>
+                            <h3>Risk Assessment</h3>
+                            <p>Comprehensive safety analysis</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>High Accuracy</h3>
+                            <p>86.25% model accuracy</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Input Form Section -->
+            <section class="prediction-section">
+                <h2>🔬 Nanomaterial Analysis</h2>
+                <p class="section-description">Enter the physicochemical properties of your nanomaterial for toxicity prediction</p>
+                
+                <form id="predictForm" class="prediction-form">
+                    <div id="inputFields" class="input-grid">
+                        <!-- Dynamic input fields will be added here -->
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="predict-btn">
+                            <i class="fas fa-play"></i>
+                            <span>Run Analysis</span>
+                        </button>
+                        <button type="button" id="resetBtn" class="reset-btn">
+                            <i class="fas fa-redo"></i>
+                            Reset
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Status Monitor -->
+            <section id="statusSection" class="status-section" style="display: none;">
+                <h3><i class="fas fa-cogs"></i> Analysis Progress</h3>
+                <div id="statusMonitor" class="status-monitor">
+                    <!-- Real-time status updates will appear here -->
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section" style="display: none;">
+                <h2>📊 Analysis Results</h2>
+                <div id="result" class="result-container">
+                    <!-- Results will be displayed here -->
+                </div>
+            </section>
+
+            <!-- Model Information -->
+            <section class="model-info-section">
+                <h2>🤖 Model Information</h2>
+                <div id="modelInfo" class="model-info">
+                    <div class="loading">Loading model information...</div>
+                </div>
+            </section>
+
+            <!-- Team Section -->
+            <section class="team-section">
+                <h2>👥 Development Team</h2>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="member-avatar">👨‍💻</div>
+                        <h3>Adnan Qureshi</h3>
+                        <p class="member-role">Lead Developer</p>
+                        <p class="member-id">Roll: 67</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">🧠</div>
+                        <h3>Chirayu Giri</h3>
+                        <p class="member-role">ML Engineer</p>
+                        <p class="member-id">Roll: 68</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">🎨</div>
+                        <h3>Abdul Adeen</h3>
+                        <p class="member-role">Web Developer</p>
+                        <p class="member-id">Roll: 69</p>
+                    </div>
+                </div>
+                <div class="guide-info">
+                    <p><i class="fas fa-user-graduate"></i> <strong>Guided by:</strong> Mrs. Sampada Bhonde</p>
+                    <p><i class="fas fa-university"></i> <strong>Project:</strong> Deep Learning Course - 2025</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>🔬 Nanomaterial Toxicity Prediction Platform | Built with AI & Machine Learning</p>
+            <p>Technology Stack: Flask, Python, scikit-learn, HTML5, CSS3, JavaScript</p>
+        </div>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
