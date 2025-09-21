@@ -5,9 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🧬 Nanomaterial Toxicity Prediction | Deep Learning Platform</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('serve_static', filename='fallback.css') }}" media="print" onload="this.media='all'">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔬</text></svg>">
     <!-- Add Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Fallback styles -->
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; color: white; margin-bottom: 30px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .subtitle { font-size: 1.2rem; opacity: 0.9; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0; }
+        .feature-card { background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .prediction-form { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); margin: 30px 0; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 10px; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .team-member { background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .member-avatar { font-size: 3rem; margin-bottom: 10px; }
+        .alert { padding: 15px; border-radius: 8px; margin: 15px 0; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .loading { text-align: center; padding: 20px; color: #666; }
+        .footer { background: rgba(0,0,0,0.1); color: white; text-align: center; padding: 20px; margin-top: 50px; }
+        .model-info-section, .team-section { background: white; margin: 30px 0; padding: 30px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .guide-info { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -155,5 +183,149 @@
     </footer>
 
     <script src="{{ url_for('static', filename='app.js') }}"></script>
+    <script>
+        // Fallback JavaScript functionality
+        if (typeof ToxicityPredictor === 'undefined') {
+            console.log('Loading fallback JavaScript...');
+            
+            // Basic form functionality
+            document.addEventListener('DOMContentLoaded', function() {
+                // Load model info
+                fetch('/model-info')
+                    .then(response => response.json())
+                    .then(data => {
+                        const modelInfoDiv = document.getElementById('modelInfo');
+                        if (modelInfoDiv && !data.error) {
+                            modelInfoDiv.innerHTML = `
+                                <div class="model-stats">
+                                    <div class="stat-item">
+                                        <h3>${data.model_type}</h3>
+                                        <p>Algorithm</p>
+                                    </div>
+                                    <div class="stat-item">
+                                        <h3>${data.training_accuracy}</h3>
+                                        <p>Accuracy</p>
+                                    </div>
+                                    <div class="stat-item">
+                                        <h3>${data.n_features}</h3>
+                                        <p>Features</p>
+                                    </div>
+                                    <div class="stat-item">
+                                        <h3>${data.n_estimators}</h3>
+                                        <p>Trees</p>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    })
+                    .catch(error => console.error('Error loading model info:', error));
+                
+                // Basic form setup
+                const form = document.getElementById('predictionForm');
+                if (form) {
+                    // Add basic form fields
+                    form.innerHTML = `
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="particle_size_nm">Particle Size (nm)</label>
+                                <input type="number" step="0.1" id="particle_size_nm" name="particle_size_nm" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="surface_area_m2g">Surface Area (m²/g)</label>
+                                <input type="number" step="0.1" id="surface_area_m2g" name="surface_area_m2g" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="concentration_mgl">Concentration (mg/L)</label>
+                                <input type="number" step="0.1" id="concentration_mgl" name="concentration_mgl" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="ph">pH</label>
+                                <input type="number" step="0.1" id="ph" name="ph" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="temperature_c">Temperature (°C)</label>
+                                <input type="number" step="0.1" id="temperature_c" name="temperature_c" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="zeta_potential_mv">Zeta Potential (mV)</label>
+                                <input type="number" step="0.1" id="zeta_potential_mv" name="zeta_potential_mv" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="material_type">Material Type</label>
+                                <select id="material_type" name="material_type" required>
+                                    <option value="0">Organic</option>
+                                    <option value="1">Metal</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="exposure_time_h">Exposure Time (hours)</label>
+                                <input type="number" step="0.1" id="exposure_time_h" name="exposure_time_h" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="aspect_ratio">Aspect Ratio</label>
+                                <input type="number" step="0.1" id="aspect_ratio" name="aspect_ratio" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">🧪 Run Analysis</button>
+                            <button type="button" class="btn-secondary" onclick="resetForm()">🔄 Reset</button>
+                        </div>
+                    `;
+                    
+                    // Add form submission handler
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        
+                        const formData = new FormData(form);
+                        const data = {};
+                        for (let [key, value] of formData.entries()) {
+                            data[key] = parseFloat(value);
+                        }
+                        
+                        fetch('/predict', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(data)
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            const resultsDiv = document.getElementById('predictionResults');
+                            if (resultsDiv) {
+                                if (result.error) {
+                                    resultsDiv.innerHTML = '<div class="alert alert-danger">Error: ' + result.error + '</div>';
+                                } else {
+                                    resultsDiv.innerHTML = `
+                                        <div class="alert alert-success">
+                                            <h3>Prediction: ${result.prediction_text}</h3>
+                                            <p>Confidence: ${result.confidence}%</p>
+                                            <p>Risk Level: ${result.risk_level}</p>
+                                            <p>Processing Time: ${result.processing_time}s</p>
+                                        </div>
+                                    `;
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            const resultsDiv = document.getElementById('predictionResults');
+                            if (resultsDiv) {
+                                resultsDiv.innerHTML = '<div class="alert alert-danger">Error: Failed to get prediction</div>';
+                            }
+                        });
+                    });
+                }
+            });
+            
+            function resetForm() {
+                document.getElementById('predictionForm').reset();
+                const resultsDiv = document.getElementById('predictionResults');
+                if (resultsDiv) {
+                    resultsDiv.innerHTML = '';
+                }
+            }
+        }
+    </script>
 </body>
 </html>
